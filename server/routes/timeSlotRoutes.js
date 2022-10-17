@@ -6,7 +6,7 @@ const {
 } = require('../controllers/timeSlotController');
 
 //add time slot
-router.post("/addtimeslot", addTimeSlots);
+router.post("/api/addtimeslot", addTimeSlots);
 
 
 module.exports = router;
