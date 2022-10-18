@@ -27,7 +27,7 @@ const addTimeAllocation = async (req, res) => {
             .then((update) => {
                 res.status(201).send({status: "Count update", update});
             }).catch((err) => {
-                res.status(400).send({status: "fail to update"});
+                res.status(400).send({status: "fail to update", err});
             })
         }else{
             //Send reply that relevant slot is full
