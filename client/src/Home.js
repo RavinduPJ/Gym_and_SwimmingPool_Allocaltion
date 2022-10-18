@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 import RegistreationForm from './Components/RegistreationForm';
-import TimeSlots from "./Components/timeSlots";
 
 
 function TabPanel(props) {
@@ -79,9 +78,7 @@ export default function Home() {
             onChangeIndex={handleChangeIndex}
         >
             <TabPanel value={value} index={0} dir={theme.direction}>
-            Item One
             <RegistreationForm />
-            <TimeSlots />
             </TabPanel>
             <TabPanel value={value} index={1} dir={theme.direction}>
             Item Two
