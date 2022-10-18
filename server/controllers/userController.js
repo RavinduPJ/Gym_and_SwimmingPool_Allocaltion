@@ -30,7 +30,19 @@ const addUserResevation = async(req, res) => {
 }
 
 
+const deleteResevation = async (req, res) => {
+    const id = req.params.id;
+
+    await User.findByIdAndDelete()
+        .then(() => {
+            res.status(200).send({status: "Resevation has been canceled"});
+        }).catch((err) =>{
+            res.status(400).send({err});
+        })
+}
+
 
 module.exports = {
-    addUserResevation
+    addUserResevation,
+    deleteResevation
 }

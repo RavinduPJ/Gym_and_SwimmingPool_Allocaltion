@@ -1,6 +1,6 @@
 const timeSlot = require('../models/TimeSlot');
 
-
+//Add time slots
 const addTimeSlots = (req, res) => {
     const {
         SlotId,
