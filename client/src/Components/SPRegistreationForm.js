@@ -1,12 +1,10 @@
 // import React from 'react'
 import * as React from 'react';
-import dayjs from 'dayjs';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -20,17 +18,11 @@ const Item = styled(Paper)(({ theme }) => ({
 const lightTheme = createTheme({ palette: { mode: 'light' } });
 const data = ['5.30 AM', '6.30 AM', '7.30 AM', '4.30 PM', '5.30 PM', '6.30 PM', '7.30 PM', '8.30 PM']
 
-const RegistreationForm = () => {
-
-  const [value, setValue] = React.useState(dayjs('2014-08-18T21:11:54'));
-
-  const handleChange = (newValue) => {
-    setValue(newValue);
-  };
+const SPRegistreationForm = () => {
 
   return (
     <div>
-      <h3>Time Allocation Form</h3>
+      <h3>Swimming Pool Time Allocation Form</h3>
       <Box
       component="form"
       sx={{
@@ -59,13 +51,16 @@ const RegistreationForm = () => {
             label="Email"
             placeholder='Email'
           />
-          {/* <DesktopDatePicker
-          label="Date desktop"
-          inputFormat="MM/DD/YYYY"
-          value={value}
-          onChange={handleChange}
-          renderInput={(params) => <TextField {...params} />}
-        /> */}
+          <TextField
+          id="date"
+          label="Birthday"
+          type="date"
+          defaultValue=""
+          sx={{ width: 220 }}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          />
           <TextField
           required
             id="outlined-time"
@@ -105,4 +100,4 @@ const RegistreationForm = () => {
   )
 }
 
-export default RegistreationForm
+export default SPRegistreationForm;
