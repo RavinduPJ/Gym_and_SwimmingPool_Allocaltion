@@ -1,11 +1,11 @@
 // import React from 'react'
-import * as React from 'react';
+import React, {useState} from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
-import { Link } from '@mui/material';
+// import { Link } from '@mui/material';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -21,6 +21,17 @@ const data = ['5.30 AM', '6.30 AM', '7.30 AM', '4.30 PM', '5.30 PM', '6.30 PM', 
 
 const GymRegistreationForm = () => {
 
+  //state variables
+  const [username, setUserName] = useState("");
+  const [epfnumber, setEPFNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [bookingdate, setBookingDate] = useState("");
+  const [bookingtimeslot, setBookingTimeSlot] = useState("");
+
+  const testingfun = (id) => {
+    setBookingTimeSlot(id);
+  }
+  
   return (
     <div>
       <h3>Gym Time Allocation Form</h3>
@@ -38,35 +49,43 @@ const GymRegistreationForm = () => {
             id="outlined-required"
             label="Username"
             placeholder='Username'
-            defaultValue=""
+            value={username}
+            onChange={e => setUserName(e.target.value)}
           />
           <TextField
           required
             id="outlined-number"
             label="EPF Number"
             placeholder='EPF Number'
+            value={epfnumber}
+            onChange={e => setEPFNumber(e.target.value)}
           />
           <TextField
           required
             id="outlined-email"
             label="Email"
             placeholder='Email'
+            value={email}
+            onChange={e => setEmail(e.target.value)}
           />
           <TextField
           id="date"
-          label="Birthday"
+          label="Booking Date"
           type="date"
-          defaultValue=""
+          value={bookingdate}
           sx={{ width: 220 }}
           InputLabelProps={{
             shrink: true,
           }}
+          onChange={e => setBookingDate(e.target.value)}
           />
           <TextField
           required
             id="outlined-time"
             label="Booking Time Slot"
             placeholder='Booking Time Slot'
+            value={bookingtimeslot}
+            onChange={e => setBookingTimeSlot(e.target.value)}
           />
         </div>
         <div>
@@ -88,7 +107,7 @@ const GymRegistreationForm = () => {
                     }}
                     >
                     {data.map((elevation) => (
-                        <Item key={elevation} elevation={4}>
+                        <Item key={elevation} elevation={4} onClick={() => {testingfun(elevation)}}>
                           {`${elevation}`}
                         </Item>
                     ))}
