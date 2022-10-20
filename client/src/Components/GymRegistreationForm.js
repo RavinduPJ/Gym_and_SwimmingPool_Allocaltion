@@ -10,8 +10,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import Stack from '@mui/material/Stack';
 import axios from 'axios';
-// import Alert from '@mui/material/Alert';
-// import AlertTitle from '@mui/material/AlertTitle';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Collapse from '@mui/material/Collapse';
 // import { Link } from '@mui/material';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -36,6 +37,10 @@ const GymRegistreationForm = () => {
   const [bookingtimeslot, setBookingTimeSlot] = useState("");
 
   const [timeslots, setTimeSlots] = useState([]);
+
+  const [openError, setOpenError] = useState(false);
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const [openInfo, setOpenInfo] = useState(false);
   
   const getAllTimeSlots = async () => {
     const timedata = await axios.get("http://localhost:5000/timeslot/api/gettimeslots");
@@ -43,16 +48,20 @@ const GymRegistreationForm = () => {
     // console.log(timedata);
   }
 
+  //delay function
+  function timeout(delay) {
+    return new Promise( res => setTimeout(res, delay) );
+  }
+
   const testingfun = (id) => {
     setBookingTimeSlot(id);
   }
   
-  const warningAlert = () => {
-    // <Alert severity="warning">
-    //   <AlertTitle>Warning</AlertTitle>
-    //     The data you filled will be clear — check it out!
-    // </Alert>
-    alert("The data will be erased - It cannot be recoverable")
+  const warningAlert = async() => {
+    setOpenInfo(true);
+    await timeout(3000); //3s delay
+    setOpenInfo(false);
+    await timeout(1000); //1s delay
     window.location.reload();
   }
   
@@ -115,6 +124,32 @@ const GymRegistreationForm = () => {
             onChange={e => setBookingTimeSlot(e.target.value)}
             disabled
           />
+        </div>
+        <div>
+          <Collapse in={openError}>
+            <Stack sx={{ width: '100%' }} spacing={2}>
+              <Alert severity="error" >
+                <AlertTitle>Error</AlertTitle>
+                  This is an error alert — <strong>check it out!</strong>
+              </Alert>
+            </Stack>
+          </Collapse>
+          <Collapse in={openInfo}>
+            <Stack sx={{ width: '100%' }} spacing={2}>
+              <Alert severity="info">
+                <AlertTitle>Info</AlertTitle>
+                    All the details will be deleted — <strong>check it out!</strong>
+              </Alert>
+            </Stack>
+          </Collapse>
+          <Collapse in={openSuccess}>
+            <Stack sx={{ width: '100%' }} spacing={2}>
+              <Alert severity="success">
+                <AlertTitle>Success</AlertTitle>
+                    You can Book this Time Slot — <strong>check it out!</strong>
+              </Alert>
+            </Stack>
+          </Collapse>
         </div>
         <div>
           <h4>Available Time Slots</h4>

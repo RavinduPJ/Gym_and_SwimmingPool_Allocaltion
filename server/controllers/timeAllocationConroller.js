@@ -46,8 +46,25 @@ const addTimeAllocation = async (req, res) => {
 }
 
 
+const checkAvailablity = async (req, res) => {
+    
+    const {
+        Date,
+        TimeSlotId 
+    } = req.body;
 
+    const exist = await timeAllocation.findOne({ Date: Date ,TimeSlotId: TimeSlotId });
+    if(exist){
+        if(exist.Count < 10) {
+            res.status(200).send({status: "availabel"});
+        } else{
+            res.status(400).send({status: "not available"});
+        }
+    }
+
+}
 
 module.exports = {
-    addTimeAllocation
+    addTimeAllocation,
+    checkAvailablity
 }
