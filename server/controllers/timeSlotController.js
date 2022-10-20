@@ -22,7 +22,18 @@ const addTimeSlots = (req, res) => {
 }
 
 
+const getAllTimeSlots = async (req, res) => {
+    await timeSlot.find()
+        .then((timeSlots) => {
+            res.status(200).send({status: "got all the time slots", timeSlots})
+        }).catch((err) => {
+            res.status(400).send({err});
+        })
+}
+
+
 
 module.exports = {
-    addTimeSlots
+    addTimeSlots,
+    getAllTimeSlots
 };

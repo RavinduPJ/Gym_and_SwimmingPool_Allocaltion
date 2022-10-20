@@ -59,7 +59,7 @@ export default function Home() {
 
   return (
     <center>
-        <Box sx={{ bgcolor: 'background.paper', width: 1000 }}>
+        <Box sx={{ bgcolor: 'background.paper', width: 700 }}>
         <AppBar position="static">
             <Tabs
             value={value}
