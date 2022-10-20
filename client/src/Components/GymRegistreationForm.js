@@ -1,10 +1,17 @@
 // import React from 'react'
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SendIcon from '@mui/icons-material/Send';
+import Stack from '@mui/material/Stack';
+import axios from 'axios';
+// import Alert from '@mui/material/Alert';
+// import AlertTitle from '@mui/material/AlertTitle';
 // import { Link } from '@mui/material';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -17,7 +24,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 // const darkTheme = createTheme({ palette: { mode: 'dark' } });
 const lightTheme = createTheme({ palette: { mode: 'light' } });
-const data = ['5.30 AM', '6.30 AM', '7.30 AM', '4.30 PM', '5.30 PM', '6.30 PM', '7.30 PM', '8.30 PM']
+// const data = ['5.30 AM', '6.30 AM', '7.30 AM', '4.30 PM', '5.30 PM', '6.30 PM', '7.30 PM', '8.30 PM']
 
 const GymRegistreationForm = () => {
 
@@ -28,10 +35,30 @@ const GymRegistreationForm = () => {
   const [bookingdate, setBookingDate] = useState("");
   const [bookingtimeslot, setBookingTimeSlot] = useState("");
 
+  const [timeslots, setTimeSlots] = useState([]);
+  
+  const getAllTimeSlots = async () => {
+    const timedata = await axios.get("http://localhost:5000/timeslot/api/gettimeslots");
+    setTimeSlots(timedata.data.timeSlots);
+    // console.log(timedata);
+  }
+
   const testingfun = (id) => {
     setBookingTimeSlot(id);
   }
   
+  const warningAlert = () => {
+    // <Alert severity="warning">
+    //   <AlertTitle>Warning</AlertTitle>
+    //     The data you filled will be clear — check it out!
+    // </Alert>
+    alert("The data will be erased - It cannot be recoverable")
+    window.location.reload();
+  }
+  
+  useEffect(() => {
+    getAllTimeSlots();
+  }, [])
   return (
     <div>
       <h3>Gym Time Allocation Form</h3>
@@ -86,6 +113,7 @@ const GymRegistreationForm = () => {
             placeholder='Booking Time Slot'
             value={bookingtimeslot}
             onChange={e => setBookingTimeSlot(e.target.value)}
+            disabled
           />
         </div>
         <div>
@@ -106,9 +134,9 @@ const GymRegistreationForm = () => {
                         gap: 2,
                     }}
                     >
-                    {data.map((elevation) => (
-                        <Item key={elevation} elevation={4} onClick={() => {testingfun(elevation)}}>
-                          {`${elevation}`}
+                    {timeslots.map((elevation) => (
+                        <Item key={elevation.SlotId} elevation={6} onClick={() => {testingfun(elevation.TimeSlot)}}>
+                          {`${elevation.TimeSlot}`}
                         </Item>
                     ))}
                     </Box>
@@ -116,9 +144,21 @@ const GymRegistreationForm = () => {
                 </Grid>
             ))}
             </Grid>
-
-
         </div>  
+        <center>
+          <Stack direction="row" spacing={37} justifyContent="center">
+            <Button variant="outlined" startIcon={<DeleteIcon />} onClick={
+              () => {
+                warningAlert()
+              }
+            }>
+              Clear
+            </Button>
+            <Button variant="contained" endIcon={<SendIcon />}>
+              Send
+            </Button>
+          </Stack>
+        </center>
     </div>
   )
 }
