@@ -34,6 +34,7 @@ const GymRegistreationForm = () => {
   const [epfnumber, setEPFNumber] = useState("");
   const [email, setEmail] = useState("");
   const [bookingdate, setBookingDate] = useState("");
+  const [bookingtimslotid, setBookingTimeSlotId] = useState("");
   const [bookingtimeslot, setBookingTimeSlot] = useState("");
 
   const [timeslots, setTimeSlots] = useState([]);
@@ -48,15 +49,23 @@ const GymRegistreationForm = () => {
     // console.log(timedata);
   }
 
+
+
+
   //delay function
   function timeout(delay) {
     return new Promise( res => setTimeout(res, delay) );
   }
 
-  const testingfun = (id) => {
-    setBookingTimeSlot(id);
+  const setTimeSlotfun = async (id) => {
+    setBookingTimeSlot(id.TimeSlot);
+    setBookingTimeSlotId(id.SlotId)
+
+    await timeout(2000);
+    checkTimeSlot();
   }
   
+  //warning alert
   const warningAlert = async() => {
     setOpenInfo(true);
     await timeout(3000); //3s delay
@@ -64,7 +73,36 @@ const GymRegistreationForm = () => {
     await timeout(1000); //1s delay
     window.location.reload();
   }
+
+  //error alert
+  const errorAlert = async() => {
+    setOpenError(true);
+    await timeout(3000); //3s delay
+    setOpenError(false);
+    await timeout(1000); //1s delay
+  }
   
+  //error alert
+  const SuccessAlert = async() => {
+    setOpenSuccess(true);
+    await timeout(3000); //3s delay
+    setOpenSuccess(false);
+    await timeout(1000); //1s delay
+  }
+
+  const checkTimeSlot = async () => {
+
+    const data = {
+      Date: bookingdate,
+      TimeSlotId: bookingtimslotid
+    }
+    
+    const result = await axios.post("http://localhost:5000/timeallocation/api/checktimeavailablity", data);
+    console.log(result);
+  }
+
+
+
   useEffect(() => {
     getAllTimeSlots();
   }, [])
@@ -170,7 +208,7 @@ const GymRegistreationForm = () => {
                     }}
                     >
                     {timeslots.map((elevation) => (
-                        <Item key={elevation.SlotId} elevation={6} onClick={() => {testingfun(elevation.TimeSlot)}}>
+                        <Item key={elevation} elevation={6} onClick={() => {setTimeSlotfun(elevation)}}>
                           {`${elevation.TimeSlot}`}
                         </Item>
                     ))}
