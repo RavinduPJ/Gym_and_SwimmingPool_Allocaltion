@@ -56,9 +56,9 @@ const checkAvailablity = async (req, res) => {
     const exist = await timeAllocation.findOne({ Date: Date ,TimeSlotId: TimeSlotId });
     if(exist){
         if(exist.Count < 10) {
-            res.status(200).send({status: "availabel"});
+            res.status(200).send({status: "available"});
         } else{
-            res.status(400).send({status: "not available"});
+            res.status(201).send({status: "not available"});
         }
     }
 
