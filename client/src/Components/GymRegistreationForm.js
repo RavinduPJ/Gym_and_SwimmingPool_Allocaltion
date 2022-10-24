@@ -41,11 +41,12 @@ const GymRegistreationForm = () => {
 
   const [openError, setOpenError] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
+  const [openSuccessReg, setOpenSuccessReg] = useState(false);
   const [openInfo, setOpenInfo] = useState(false);
   
   const getAllTimeSlots = async () => {
-    const timedata = await axios.get("http://localhost:5000/timeslot/api/gettimeslots");
-    setTimeSlots(timedata.data.timeSlots);
+    const timedata = await axios.get("http://localhost:5000/getalltimeslots");
+    setTimeSlots(timedata.data);
     // console.log(timedata);
   }
 
@@ -58,8 +59,8 @@ const GymRegistreationForm = () => {
   }
 
   const setTimeSlotfun = async (id) => {
-    setBookingTimeSlot(id.TimeSlot);
-    setBookingTimeSlotId(id.SlotId)
+    setBookingTimeSlot(id.timeslot_value);
+    setBookingTimeSlotId(id.timeslot_id)
 
     await timeout(2000);
     checkTimeSlot();
@@ -82,7 +83,7 @@ const GymRegistreationForm = () => {
     await timeout(1000); //1s delay
   }
   
-  //error alert
+  //success alert
   const SuccessAlert = async() => {
     setOpenSuccess(true);
     await timeout(3000); //3s delay
@@ -90,16 +91,52 @@ const GymRegistreationForm = () => {
     await timeout(1000); //1s delay
   }
 
+  //success alert
+  const SuccessRegAlert = async() => {
+    setOpenSuccessReg(true);
+    await timeout(3000); //3s delay
+    setOpenSuccessReg(false);
+    await timeout(1000); //1s delay
+  }
+
   const checkTimeSlot = async () => {
 
     const data = {
-      Date: bookingdate,
-      TimeSlotId: bookingtimslotid
+      bookingdate,
+      bookingtimslotid
     }
     
-    const result = await axios.post("http://localhost:5000/timeallocation/api/checktimeavailablity", data);
+    const result = await axios.post("http://localhost:5000/checktimeavailablity", data);
     console.log(result);
+
+    if(result.data.status === 'available'){
+      SuccessAlert();
+    } else {
+      errorAlert();
+    }
   }
+
+  //add user
+  const adduser = async () => {
+    
+    const data = {
+      username,
+      email,
+      epfnumber,
+      bookingdate,
+      bookingtimslotid
+    };
+
+    // console.log(data);
+    const result = await axios.post("http://localhost:5000/adduser", data);
+    //console.log(result.data.rowCount);
+    if(result.data.rowCount === 1){
+      SuccessRegAlert();
+    } else {
+      errorAlert();
+    }
+  }
+
 
 
 
@@ -188,6 +225,14 @@ const GymRegistreationForm = () => {
               </Alert>
             </Stack>
           </Collapse>
+          <Collapse in={openSuccessReg}>
+            <Stack sx={{ width: '100%' }} spacing={2}>
+              <Alert severity="success">
+                <AlertTitle>Success</AlertTitle>
+                    You have successfully registered — <strong>check it out!</strong>
+              </Alert>
+            </Stack>
+          </Collapse>
         </div>
         <div>
           <h4>Available Time Slots</h4>
@@ -209,7 +254,7 @@ const GymRegistreationForm = () => {
                     >
                     {timeslots.map((elevation) => (
                         <Item key={elevation} elevation={6} onClick={() => {setTimeSlotfun(elevation)}}>
-                          {`${elevation.TimeSlot}`}
+                          {`${elevation.timeslot_value}`}
                         </Item>
                     ))}
                     </Box>
@@ -227,7 +272,7 @@ const GymRegistreationForm = () => {
             }>
               Clear
             </Button>
-            <Button variant="contained" endIcon={<SendIcon />}>
+            <Button variant="contained" endIcon={<SendIcon />} onClick={() => {adduser()}}>
               Send
             </Button>
           </Stack>

@@ -4,6 +4,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 // import RegistreationForm from "./Components/RegistreationForm";
 // import TimeSlots from "./Components/timeSlots";
 import Home from './Home';
+import Admin from './Admin';
+
 
 function App() {
   return (
@@ -11,10 +13,11 @@ function App() {
       <h1>Swimming Pool & Gym Allocation Tool</h1>
       <BrowserRouter>
         <Routes>
-            <Route path='' />
+            <Route path='/home' element={<Home />}/>
+            <Route path='/admin' element={<Admin />}/>
         </Routes>
       </BrowserRouter>
-      <Home />
+      {/* <Home /> */}
 
     </div>
   );
