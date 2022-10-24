@@ -59,7 +59,7 @@ export default function Home() {
 
   return (
     <center>
-        <h2>Admin Panale</h2>
+        <h2>Admin Dashboard</h2>
         <Box sx={{ bgcolor: 'background.paper', width: 700 }}>
         <AppBar position="static">
             <Tabs

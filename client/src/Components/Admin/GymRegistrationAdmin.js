@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useEffect, useState} from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -7,48 +7,84 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import axios from 'axios';
 
 export default function GymRegistreationAdmin() {
+
+    const [users, setUsers] = useState([]);
+    const [date, setDate] = useState("");
+
+    // console.log(users.filter(user => user.bookingdate.includes(date)));
+
+    const getallusers = async () => {
+        const result = await axios.get("http://localhost:5000/getall");
+        console.log(result.data);
+        setUsers(result.data); 
+    }
+
+    const clearFilter = () => {
+        window.location.reload();
+    }
+
+    useEffect(() => {
+        getallusers();
+    }, [])
+
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Username</TableCell>
-            <TableCell align="right">EPF Number</TableCell>
-            <TableCell align="right">Email</TableCell>
-            <TableCell align="right">Booking Date</TableCell>
-            <TableCell align="right">Booking Time</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.name}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
+    <Box
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { m: 1, width: '25ch' },
+      }}
+      noValidate
+      autoComplete="off"
+    >
+        <TextField
+          id="date"
+          label="Booking Date"
+          type="date"
+          value={date}
+          sx={{ width: 220 }}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={e => setDate(e.target.value)}
+          />
+          <Button variant="contained" size="large" onClick={() => {clearFilter()}}>
+          Small
+        </Button>
+        <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+            <TableRow>
+                <TableCell>Username</TableCell>
+                <TableCell align="right">EPF Number</TableCell>
+                <TableCell align="right">Email</TableCell>
+                <TableCell align="right">Booking Date</TableCell>
+                <TableCell align="right">Booking Time</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+            </TableHead>
+            <TableBody>
+            {users.filter(user => user.bookingdate.includes(date)).map((row) => (
+                <TableRow
+                key={row.epfnumber}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                <TableCell component="th" scope="row">
+                    {row.username}
+                </TableCell>
+                <TableCell align="right">{row.epfnumber}</TableCell>
+                <TableCell align="right">{row.email}</TableCell>
+                <TableCell align="right">{row.bookingdate.split('T')[0]}</TableCell>
+                <TableCell align="right">{row.timeslot_value}</TableCell>
+                </TableRow>
+            ))}
+            </TableBody>
+        </Table>
+        </TableContainer>
+    </Box>
   );
 }
