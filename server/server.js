@@ -51,25 +51,24 @@ app.post("/adddepartment", (req, res) => {
 });
 
 //getall departments
-app.get("/getalldepartments", (req, res) => {
+    app.get("/getalldepartments", async (req, res) => {
+        try {
+            const department = await pool.query("SELECT * FROM department");
+            res.json(department.rows);
+        } catch (error) {
+            console.log(error.message);
+        }
+    })
     
-    try {
-        const result = pool.query("SELECT * FROM department");
-        res.json(result);    
-    } catch (error) {
-        console.log(error);
-    }
-});
-
 //timeallocation---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//check
-app.post("/checktimeavailablity", async (req, res) => {
+//check availability of gym
+app.post("/checktimeavailablitygym", async (req, res) => {
     const {
         bookingdate,
         bookingtimslotid
     } = req.body
     try {
-        const data = await pool.query("SELECT * FROM timeallocation WHERE date_value = $1 AND timeslot_id = $2 AND user_count = 10 ", [bookingdate, bookingtimslotid]);
+        const data = await pool.query("SELECT * FROM gymtimeallocation WHERE date_value = $1 AND timeslot_id = $2 AND user_count = 10 ", [bookingdate, bookingtimslotid]);
 
         const result = data.rowCount;
         if(result > 0) {
@@ -82,8 +81,29 @@ app.post("/checktimeavailablity", async (req, res) => {
     }
 })
 
-//add time allocation
-app.post("/allocatetime", async (req, res) => {
+
+//check availablity of pool
+app.post("/checktimeavailablitypool", async (req, res) => {
+    const {
+        bookingdate,
+        bookingtimslotid
+    } = req.body
+    try {
+        const data = await pool.query("SELECT * FROM pooltimeallocation WHERE date_value = $1 AND timeslot_id = $2 AND user_count = 10 ", [bookingdate, bookingtimslotid]);
+
+        const result = data.rowCount;
+        if(result > 0) {
+            res.send({status: "not available"});
+        } else {
+            res.send({status: "available"});
+        }
+    } catch (error) {
+        console.log(error.message)
+    }
+})
+
+//add time allocation for gym
+app.post("/gymallocatetime", async (req, res) => {
     const { 
         bookingdate,
         //timeslotvalue,//there is an issue with this valiable
@@ -91,13 +111,38 @@ app.post("/allocatetime", async (req, res) => {
     } = req.body;
 
     try {
-        const data = await pool.query("SELECT * FROM timeallocation WHERE date_value = $1 AND timeslot_id = $2", [bookingdate, bookingtimslotid])
+        const data = await pool.query("SELECT * FROM gymtimeallocation WHERE date_value = $1 AND timeslot_id = $2", [bookingdate, bookingtimslotid])
         if(data.rowCount == 0){
-            const insertData = await pool.query("INSERT INTO timeallocation (date_value, timeslot_id, user_count) VALUES ($1, $2, '1') RETURNING *", [bookingdate, bookingtimslotid]);
+            const insertData = await pool.query("INSERT INTO gymtimeallocation (date_value, timeslot_id, user_count) VALUES ($1, $2, '1') RETURNING *", [bookingdate, bookingtimslotid]);
 
             res.json(insertData.rows);
         } else {
-            const updateCount = await pool.query("UPDATE timeallocation SET user_count = user_count + 1 WHERE date_value = $1 AND timeslot_id = $2 RETURNING *", [bookingdate,bookingtimslotid]);
+            const updateCount = await pool.query("UPDATE gymtimeallocation SET user_count = user_count + 1 WHERE date_value = $1 AND timeslot_id = $2 RETURNING *", [bookingdate,bookingtimslotid]);
+
+            res.json(updateCount.rows);
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+})
+
+
+//add time allocation for pool
+app.post("/spoolallocatetime", async (req, res) => {
+    const { 
+        bookingdate,
+        //timeslotvalue,//there is an issue with this valiable
+        bookingtimslotid,
+    } = req.body;
+
+    try {
+        const data = await pool.query("SELECT * FROM pooltimeallocation WHERE date_value = $1 AND timeslot_id = $2", [bookingdate, bookingtimslotid])
+        if(data.rowCount == 0){
+            const insertData = await pool.query("INSERT INTO pooltimeallocation (date_value, timeslot_id, user_count) VALUES ($1, $2, '1') RETURNING *", [bookingdate, bookingtimslotid]);
+
+            res.json(insertData.rows);
+        } else {
+            const updateCount = await pool.query("UPDATE pooltimeallocation SET user_count = user_count + 1 WHERE date_value = $1 AND timeslot_id = $2 RETURNING *", [bookingdate,bookingtimslotid]);
 
             res.json(updateCount.rows);
         }
@@ -120,7 +165,7 @@ app.post("/addgymuser", async (req, res) => {
         bookingtimslotid
     } = req.body;
 
-    const result = await pool.query("INSERT INTO user_details VALUES ($1, $2, $3, $4, $5, 'G') RETURNING *", [username, email, epfnumber, dept_id, bookingdate, bookingtimslotid]);
+    const result = await pool.query("INSERT INTO user_details (username, email, epfnumber, dpt_id, bookingdate, bookingtimeslotid, bookingplace) VALUES ($1, $2, $3, $4, $5, $6, 'G') RETURNING *", [username, email, epfnumber, dept_id, bookingdate, bookingtimslotid]);
     if(result){
         res.json(result);
     } else {

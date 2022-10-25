@@ -13,6 +13,7 @@ import axios from 'axios';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Collapse from '@mui/material/Collapse';
+import MenuItem from '@mui/material/MenuItem';
 // import { Link } from '@mui/material';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -33,9 +34,12 @@ const GymRegistreationForm = () => {
   const [username, setUserName] = useState("");
   const [epfnumber, setEPFNumber] = useState("");
   const [email, setEmail] = useState("");
+  const [deptname, setDeptName] = useState("");
+  const [dept_id, setDept_id] = useState("");
   const [bookingdate, setBookingDate] = useState("");
   const [bookingtimslotid, setBookingTimeSlotId] = useState("");
   const [bookingtimeslot, setBookingTimeSlot] = useState("");
+  const [dept, setDept] = useState([]);
 
   const [timeslots, setTimeSlots] = useState([]);
 
@@ -47,11 +51,18 @@ const GymRegistreationForm = () => {
   const getAllTimeSlots = async () => {
     const timedata = await axios.get("http://localhost:5000/getalltimeslots");
     setTimeSlots(timedata.data);
-    // console.log(timedata);
+    // console.log(timedata.data);
   }
 
+  const getAllDepartments = async () => {
+    const deptdata = await axios.get("http://localhost:5000/getalldepartments");
+    setDept(deptdata.data);
+    console.log(deptdata.data);
+  }
 
-
+  const handleChange = (event) => {
+    setDeptName(event.target.value);
+  };
 
   //delay function
   function timeout(delay) {
@@ -106,7 +117,7 @@ const GymRegistreationForm = () => {
       bookingtimslotid
     }
     
-    const result = await axios.post("http://localhost:5000/checktimeavailablity", data);
+    const result = await axios.post("http://localhost:5000/checktimeavailablitygym", data);
     console.log(result);
 
     if(result.data.status === 'available'){
@@ -123,13 +134,14 @@ const GymRegistreationForm = () => {
       username,
       email,
       epfnumber,
+      dept_id,
       bookingdate,
       bookingtimslotid
     };
 
-    // console.log(data);
-    const result = await axios.post("http://localhost:5000/adduser", data);
-    //console.log(result.data.rowCount);
+    console.log(data);
+    const result = await axios.post("http://localhost:5000/addgymuser", data);
+    // console.log(result.data.rowCount);
     allocatetime();
     if(result.data.rowCount === 1){
       SuccessRegAlert();
@@ -145,13 +157,14 @@ const allocatetime = async () => {
     bookingtimslotid
   };
 
-  await axios.post("http://localhost:5000/allocatetime", data);
+  await axios.post("http://localhost:5000/gymallocatetime", data);
 
 }
 
 
   useEffect(() => {
     getAllTimeSlots();
+    getAllDepartments();
   }, [])
   return (
     <div>
@@ -189,6 +202,20 @@ const allocatetime = async () => {
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
+           <TextField
+          id="outlined-select-currency"
+          select
+          label="Select"
+          value={deptname}
+          onChange={handleChange}
+          helperText="Please select your department"
+        >
+          {dept.map((option) => (
+            <MenuItem key={option.dept_id} value={option.dept_name} onClick={() => {setDept_id(option.dept_id)}}>
+              {option.dept_name}
+            </MenuItem>
+          ))}
+          </TextField>
           <TextField
           id="date"
           label="Booking Date"
