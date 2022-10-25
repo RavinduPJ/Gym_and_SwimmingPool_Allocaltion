@@ -9,33 +9,21 @@ app.use(express.json());
 
 //Routes
 
-//test create
-app.post("/todo", async (req, res) => {
-    try {
-        const {description} = req.body;
-        const newTodo = await pool.query(
-            "INSERT INTO todo (description) VALUES ($1)", [description]
-            );
-        res.json(newTodo);
+//timeslots--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//insert time slots
+app.post("/inserttimeslots", (req, res) => {
 
-    } catch (error) {
-        console.log(error.message);
-    }
-});
-
-//test read
-app.get("/read", async (req, res) => {
+    const {
+        timeslot_value
+    } = req.body;
     try {
-        const read = await pool.query("SELECT * FROM todo");
-        res.json(read.rows);
+        const timeslots = pool.query("INSERT INTO timeslots(timeslot_value) VALUEs ($1) RETURNING *", [timeslot_value]);
+        console.log(timeslots);
+        res.status(200).send({timeslots});
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
     }
 })
-
-// app.use("/api", require('./routes/testRoutes'));
-
-//timeslots
 //get all time slots
 app.get("/getalltimeslots", async (req, res) => {
     try {
@@ -46,8 +34,34 @@ app.get("/getalltimeslots", async (req, res) => {
     }
 })
 
+//department ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//add department
+app.post("/adddepartment", (req, res) => {
+    const {
+        department
+    } = req.body;
+    
+    try {
+        const result = pool.query("INSERT INTO department (dept_name) VALUES ($1)", [department]);
+            res.json(result);
+            console.log(result);
+    } catch (error) {
+        console.log(error);
+    }
+});
 
-//timeallocation
+//getall departments
+app.get("/getalldepartments", (req, res) => {
+    
+    try {
+        const result = pool.query("SELECT * FROM department");
+        res.json(result);    
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+//timeallocation---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //check
 app.post("/checktimeavailablity", async (req, res) => {
     const {
@@ -92,20 +106,43 @@ app.post("/allocatetime", async (req, res) => {
     }
 })
 
-//userdetails
-//add user details
+//userdetails------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//add gym user details
 
-app.post("/adduser", async (req, res) => {
+app.post("/addgymuser", async (req, res) => {
 
     const {
         username,
         email,
         epfnumber,
+        dept_id,
         bookingdate,
         bookingtimslotid
     } = req.body;
 
-    const result = await pool.query("INSERT INTO user_details VALUES ($1, $2, $3, $4, $5) RETURNING *", [username, email, epfnumber, bookingdate, bookingtimslotid]);
+    const result = await pool.query("INSERT INTO user_details VALUES ($1, $2, $3, $4, $5, 'G') RETURNING *", [username, email, epfnumber, dept_id, bookingdate, bookingtimslotid]);
+    if(result){
+        res.json(result);
+    } else {
+        res.status(400).send({status: "error"});
+    }
+
+});
+
+//add spool user details
+
+app.post("/addspooluser", async (req, res) => {
+
+    const {
+        username,
+        email,
+        epfnumber,
+        dept_id,
+        bookingdate,
+        bookingtimslotid
+    } = req.body;
+
+    const result = await pool.query("INSERT INTO user_details VALUES ($1, $2, $3, $4, $5, 'SW') RETURNING *", [username, email, epfnumber, dept_id, bookingdate, bookingtimslotid]);
     if(result){
         res.json(result);
     } else {
@@ -114,10 +151,22 @@ app.post("/adduser", async (req, res) => {
 
 })
 
-//get all users
-app.get("/getall", async (req, res) => {
+//get all users in Gym
+app.get("/getallingym", async (req, res) => {
 
-    const result = await pool.query("SELECT a.username, a.email, a.epfnumber, (a.bookingdate + 1) AS bookingdate, b.timeslot_value  FROM user_details a, timeslots b WHERE b.timeslot_id = a.bookingtimeslotid");
+    const result = await pool.query("SELECT a.username, a.email, a.epfnumber, b.timeslot_value, c.dept_name, (a.bookingdate + 1) AS bookingdate FROM user_details a, timeslots b, department c WHERE a.dpt_id = c.dept_id AND a.bookingtimeslotid = b.timeslot_id AND a.bookingplace = 'G'");
+
+    if(result){
+        res.json(result.rows);
+    } else {
+        res.status(400).send({status: "error"});
+    }
+})
+
+//get all users in SP
+app.get("/getallinspool", async (req, res) => {
+
+    const result = await pool.query("SELECT a.username, a.email, a.epfnumber, b.timeslot_value, c.dept_name, (a.bookingdate + 1) AS bookingdate FROM user_details a, timeslots b, department c WHERE a.dpt_id = c.dept_id AND a.bookingtimeslotid = b.timeslot_id AND a.bookingplace = 'SP'");
 
     if(result){
         res.json(result.rows);
