@@ -71,19 +71,19 @@ app.post("/checktimeavailablity", async (req, res) => {
 //add time allocation
 app.post("/allocatetime", async (req, res) => {
     const { 
-        date,
+        bookingdate,
         //timeslotvalue,//there is an issue with this valiable
-        timeslotid,
+        bookingtimslotid,
     } = req.body;
 
     try {
-        const data = await pool.query("SELECT * FROM timeallocation WHERE date_value = $1 AND timeslot_id = $2", [date, timeslotid])
+        const data = await pool.query("SELECT * FROM timeallocation WHERE date_value = $1 AND timeslot_id = $2", [bookingdate, bookingtimslotid])
         if(data.rowCount == 0){
-            const insertData = await pool.query("INSERT INTO timeallocation (date_value, timeslot_value, timeslot_id, user_count) VALUES ($1, $2, $3, '1') RETURNING *", [date, timeslotvalue, timeslotid]);
+            const insertData = await pool.query("INSERT INTO timeallocation (date_value, timeslot_id, user_count) VALUES ($1, $2, '1') RETURNING *", [bookingdate, bookingtimslotid]);
 
             res.json(insertData.rows);
         } else {
-            const updateCount = await pool.query("UPDATE timeallocation SET user_count = user_count + 1 WHERE date_value = $1 AND timeslot_id = $2 RETURNING *", [date,timeslotid]);
+            const updateCount = await pool.query("UPDATE timeallocation SET user_count = user_count + 1 WHERE date_value = $1 AND timeslot_id = $2 RETURNING *", [bookingdate,bookingtimslotid]);
 
             res.json(updateCount.rows);
         }
@@ -114,6 +114,17 @@ app.post("/adduser", async (req, res) => {
 
 })
 
+//get all users
+app.get("/getall", async (req, res) => {
+
+    const result = await pool.query("SELECT a.username, a.email, a.epfnumber, (a.bookingdate + 1) AS bookingdate, b.timeslot_value  FROM user_details a, timeslots b WHERE b.timeslot_id = a.bookingtimeslotid");
+
+    if(result){
+        res.json(result.rows);
+    } else {
+        res.status(400).send({status: "error"});
+    }
+})
 
 app.listen(5000, () => {
     console.log("server is running on port 5000");

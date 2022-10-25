@@ -130,6 +130,7 @@ const GymRegistreationForm = () => {
     // console.log(data);
     const result = await axios.post("http://localhost:5000/adduser", data);
     //console.log(result.data.rowCount);
+    allocatetime();
     if(result.data.rowCount === 1){
       SuccessRegAlert();
     } else {
@@ -137,7 +138,16 @@ const GymRegistreationForm = () => {
     }
   }
 
+const allocatetime = async () => {
 
+  const data = {
+    bookingdate,
+    bookingtimslotid
+  };
+
+  await axios.post("http://localhost:5000/allocatetime", data);
+
+}
 
 
   useEffect(() => {
