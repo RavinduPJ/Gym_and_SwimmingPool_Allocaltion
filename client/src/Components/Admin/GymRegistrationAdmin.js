@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -6,16 +6,19 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import axios from 'axios';
+import { DownloadTableExcel } from 'react-export-table-to-excel';
 
 export default function GymRegistreationAdmin() {
 
     const [users, setUsers] = useState([]);
     const [date, setDate] = useState("");
+    const tableRef = useRef(null);
 
     // console.log(users.filter(user => user.bookingdate.includes(date)));
 
@@ -38,26 +41,36 @@ export default function GymRegistreationAdmin() {
       component="form"
       sx={{
         '& .MuiTextField-root': { m: 1, width: '25ch' },
-      }}
+    }}
       noValidate
       autoComplete="off"
     >
+        <Button variant="outlined" size="large" sx={{marginTop: 0.5}} onClick={() => {clearFilter()}}>
+            Clear Filter
+        </Button>
         <TextField
           id="date"
           label="Booking Date"
           type="date"
           value={date}
+          size="small"
           sx={{ width: 220 }}
           InputLabelProps={{
-            shrink: true,
-          }}
+              shrink: true,
+            }}
           onChange={e => setDate(e.target.value)}
           />
-          <Button variant="contained" size="large" onClick={() => {clearFilter()}}>
-          Small
-        </Button>
+        <DownloadTableExcel
+                    filename="users table"
+                    sheet="users"
+                    currentTableRef={tableRef.current}
+                >
+                <Button variant="contained" size="large" sx={{marginTop: 0.5}} color="success" startIcon={<TextSnippetIcon/>}>
+                Export excel
+                </Button>
+        </DownloadTableExcel>
         <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table sx={{ minWidth: 650 }} aria-label="simple table"  ref={tableRef}>
             <TableHead>
             <TableRow>
                 <TableCell>Username</TableCell>
