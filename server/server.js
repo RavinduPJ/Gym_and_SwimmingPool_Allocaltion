@@ -187,9 +187,9 @@ app.post("/addspooluser", async (req, res) => {
         bookingtimslotid
     } = req.body;
 
-    const result = await pool.query("INSERT INTO user_details VALUES ($1, $2, $3, $4, $5, 'SW') RETURNING *", [username, email, epfnumber, dept_id, bookingdate, bookingtimslotid]);
-    if(result){
-        res.json(result);
+    const resultp = await pool.query("INSERT INTO user_details (username, email, epfnumber, dpt_id, bookingdate, bookingtimeslotid, bookingplace)  VALUES ($1, $2, $3, $4, $5, $6, 'SW') RETURNING *", [username, email, epfnumber, dept_id, bookingdate, bookingtimslotid]);
+    if(resultp){
+        res.json(resultp);
     } else {
         res.status(400).send({status: "error"});
     }
@@ -211,7 +211,7 @@ app.get("/getallingym", async (req, res) => {
 //get all users in SP
 app.get("/getallinspool", async (req, res) => {
 
-    const result = await pool.query("SELECT a.username, a.email, a.epfnumber, b.timeslot_value, c.dept_name, (a.bookingdate + 1) AS bookingdate FROM user_details a, timeslots b, department c WHERE a.dpt_id = c.dept_id AND a.bookingtimeslotid = b.timeslot_id AND a.bookingplace = 'SP'");
+    const result = await pool.query("SELECT a.username, a.email, a.epfnumber, b.timeslot_value, c.dept_name, (a.bookingdate + 1) AS bookingdate FROM user_details a, timeslots b, department c WHERE a.dpt_id = c.dept_id AND a.bookingtimeslotid = b.timeslot_id AND a.bookingplace = 'SW'");
 
     if(result){
         res.json(result.rows);
