@@ -23,7 +23,7 @@ export default function GymRegistreationAdmin() {
     // console.log(users.filter(user => user.bookingdate.includes(date)));
 
     const getallusers = async () => {
-        const result = await axios.get("http://localhost:5000/getall");
+        const result = await axios.get("http://localhost:5000/getallingym");
         console.log(result.data);
         setUsers(result.data); 
     }
@@ -76,6 +76,7 @@ export default function GymRegistreationAdmin() {
                 <TableCell>Username</TableCell>
                 <TableCell align="right">EPF Number</TableCell>
                 <TableCell align="right">Email</TableCell>
+                <TableCell align="right">Department</TableCell>
                 <TableCell align="right">Booking Date</TableCell>
                 <TableCell align="right">Booking Time</TableCell>
             </TableRow>
@@ -91,6 +92,7 @@ export default function GymRegistreationAdmin() {
                 </TableCell>
                 <TableCell align="right">{row.epfnumber}</TableCell>
                 <TableCell align="right">{row.email}</TableCell>
+                <TableCell align="right">{row.dept_name}</TableCell>
                 <TableCell align="right">{row.bookingdate.split('T')[0]}</TableCell>
                 <TableCell align="right">{row.timeslot_value}</TableCell>
                 </TableRow>
